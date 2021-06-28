@@ -5,7 +5,7 @@ import csv
 from datetime import datetime
 
 GUI = Tk()
-GUI.title('โปรแกรมบันทึกค่าใช้จ่าย By Sim')
+GUI.title('โปรแกรมบันทึกค่าใช้จ่าย v 1.0 By Sim')
 GUI.geometry('600x700+500+50')
 
 
@@ -25,6 +25,7 @@ filemenu.add_command(label='Export to Googlesheet')
 
 #Help
 def About():
+    print('About Menu')
     messagebox.showinfo('About','โปรแกรมนี้คือโปรแกรมบันทึกข้อมูล\nสนใจบริจาคไหม? จ่ายแค่ 1 BTC')
 
 helpmenu = Menu(menubar,tearoff=0)
