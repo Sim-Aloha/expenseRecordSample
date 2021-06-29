@@ -6,7 +6,19 @@ from datetime import datetime
 
 GUI = Tk()
 GUI.title('โปรแกรมบันทึกค่าใช้จ่าย v 1.0 By Sim')
-GUI.geometry('720x700+500+50')
+#GUI.geometry('720x700+500+50')
+
+w = 720
+h = 500
+
+ws = GUI.winfo_screenwidth() #screen width | check ว่าหน้าจอคอมพิวเตอร์ของเรานั้นกว้างเท่าไหร่
+hs = GUI.winfo_screenheight() #screen height
+
+
+x = (ws/2) - (w/2)
+y = (hs/2) - (h/2) - 50
+
+GUI.geometry(f'{w}x{h}+{x:.0f}+{y:.0f}')
 
 
 #B1 = Button(GUI,text='Hello')
@@ -158,7 +170,7 @@ E3.pack()
 icon_t3 = PhotoImage(file='t3_save.png')
 
 B2 = ttk.Button(F1,text=f'{"Save": >{6}}',image=icon_t3,compound='left',command=Save)
-B2.pack(ipadx=7,ipady=7)
+B2.pack(ipadx=50,ipady=20,pady=20)
 
 v_result = StringVar()
 v_result.set('----------ผลลัพธ์--------------')
@@ -214,13 +226,13 @@ def DeleteRecord(event=None):
     if check == True:
         print('delete')
         select = resulttable.selection()
-        print(select)
+       # print(select)
         data = resulttable.item(select)
         data = data['values']
         transactionid = data[0]
-        print(transactionid)
+        #print(transactionid)
         del alltransaction[str(transactionid)] # delete data in dict
-        print(alltransaction)
+        #print(alltransaction)
         UpdateCSV()
         #update_table()
     else:
@@ -245,6 +257,93 @@ def update_table():
     except Exception as e:
         print('No file')
         print('Error',e)
+
+###########Right click Menu##############
+def EditRecord():
+    POPUP = Toplevel() #คล้ายๆ Tk()
+    POPUP.title('Edit Record')
+    #POPUP.geometry('500x400')
+
+    w = 500
+    h = 400
+
+    ws = POPUP.winfo_screenwidth() #screen width | check ว่าหน้าจอคอมพิวเตอร์ของเรานั้นกว้างเท่าไหร่
+    hs = POPUP.winfo_screenheight() #screen height
+
+
+    x = (ws/2) - (w/2)
+    y = (hs/2) - (h/2) - 50
+
+    POPUP.geometry(f'{w}x{h}+{x:.0f}+{y:.0f}')
+
+    #------text1----------
+    L = ttk.Label(POPUP,text='รายการค่าใช้จ่าย',font=FONT1).pack()
+    v_expense = StringVar() # StringVar() คือตัวแปรพิเศษสำหรับเก็บข้อมูลใน GUI
+    E1 = ttk.Entry(POPUP,textvariable=v_expense,font=FONT1)
+    E1.pack()
+    #----------------
+
+    #------text2----------
+    L = ttk.Label(POPUP,text='ราคา (บาท)',font=FONT1).pack()
+    v_price = StringVar() # StringVar() คือตัวแปรพิเศษสำหรับเก็บข้อมูลใน GUI
+    E2 = ttk.Entry(POPUP,textvariable=v_price,font=FONT1)
+    E2.pack()
+    #----------------
+
+    #--------------text3--------------
+    L = ttk.Label(POPUP,text='จำนวน (ชิ้น)',font=FONT1).pack()
+    v_quantity = StringVar()
+    E3 = ttk.Entry(POPUP,textvariable=v_quantity,font=FONT1)
+    E3.pack()
+    #------------------
+
+    def Edit():
+       # print(transactionid)
+        #print(alltransaction)
+        olddata = alltransaction[str(transactionid)]
+        print('OLD:',olddata)
+        v1 = v_expense.get()
+        v2 = float(v_price.get())
+        v3 = float(v_quantity.get())
+        total = v2 * v3
+
+        newdata = [olddata[0],olddata[1],v1,v2,v3,total]
+        alltransaction[str(transactionid)] = newdata
+        UpdateCSV()
+        update_table()
+        POPUP.destroy() #สั่งปิด popup 
+
+    icon_t3 = PhotoImage(file='t3_save.png')
+
+    B2 = ttk.Button(POPUP,text=f'{"Save": >{6}}',image=icon_t3,compound='left',command=Edit)
+    B2.pack(ipadx=50,ipady=20,pady=20)
+
+    # get data in selected record
+    select = resulttable.selection()
+    print(select)
+    data = resulttable.item(select)
+    data = data['values']
+    print(data)
+    transactionid = data[0]
+
+    #สั่งเซตค่าเก่าไว้ตรงช่องกรอก
+    v_expense.set(data[2])
+    v_price.set(data[3])
+    v_quantity.set(data[4])
+    POPUP.mainloop()
+
+rightclick = Menu(GUI,tearoff=0)
+rightclick.add_command(label='Edit',command=EditRecord)
+rightclick.add_command(label='Delete',command=DeleteRecord)
+
+
+def menupopup(event):
+    #print(event.x_root,event.y_root)
+    rightclick.post(event.x_root,event.y_root)
+
+resulttable.bind('<Button-3>',menupopup)
+
+
 
 update_table()
 print('GET CHILD:',resulttable.get_children())
